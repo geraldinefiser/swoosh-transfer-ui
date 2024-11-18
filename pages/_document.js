@@ -6,10 +6,10 @@ export default function Document() {
     <Html lang="en">
       <Head />
       <body>
-				<Theme>
-					<Main />
+        <Theme>
+          <Main />
           {/* <ThemePanel /> */}
-				</Theme>
+        </Theme>
         <NextScript />
       </body>
     </Html>

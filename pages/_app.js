@@ -1,5 +1,5 @@
-import "@/styles/globals.css";
 import "@radix-ui/themes/styles.css";
+import "@/styles/globals.css";
 
 import '@rainbow-me/rainbowkit/styles.css';
 import {

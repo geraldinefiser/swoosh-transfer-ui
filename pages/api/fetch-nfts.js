@@ -5,7 +5,7 @@ import FakeJsonData from '@/utils/fakeJsonData.json';
 export default async function handler(req, res) {
   const for_address = req.query.for_address
   const url = `https://avax-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}/getNFTsForOwner?owner=${for_address}`
-  console.log(url);
+
   switch (req.method) { 
     case 'GET':
       try {
