@@ -8,7 +8,6 @@ export default function Document() {
       <body>
         <Theme>
           <Main />
-          {/* <ThemePanel /> */}
         </Theme>
         <NextScript />
       </body>
