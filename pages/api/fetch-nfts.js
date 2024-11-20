@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   const for_collection = req.query.for_collection;
   const for_pageKey = req.query.for_pageKey ?? null;
 
-  const url = `https://avax-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}/getNFTsForOwner?owner=${for_address}&contractAddresses[]=${for_collection}&pageSize=10&pageKey=${for_pageKey}`;
+  const url = `https://avax-mainnet.g.alchemy.com/nft/v3/${process.env.ALCHEMY_API_KEY}/getNFTsForOwner?owner=${for_address}&contractAddresses[]=${for_collection}&pageSize=10&pageKey=${for_pageKey}`;
 
   const vercelDomain = process.env.VERCEL_URL;
   switch (req.method) {
