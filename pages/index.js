@@ -1,16 +1,8 @@
+import Nav from "@/components/nav";
 import NftTable from "@/components/nftTable";
-import {
-  Avatar,
-  RadioCards,
-  Badge,
-  Code,
-  ScrollArea,
-  Separator,
-  Skeleton,
-  Flex,
-  Text,
-} from "@radix-ui/themes";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { HomeIcon } from "@heroicons/react/24/outline";
+import { Avatar, RadioCards, Badge, Code, ScrollArea } from "@radix-ui/themes";
+
 import { useState } from "react";
 import useSWR from "swr";
 import { useAccount } from "wagmi";
@@ -37,54 +29,83 @@ export default function Home() {
     fetcher,
     { focusThrottleInterval: 3600000 }
   );
-  console.log(nftData);
+
+  if (!address) {
+    return (
+      <div>
+        <Nav />
+        <div className="flex flex-row items-start gap-10 px-10">
+          <div className="flex flex-col w-[300px]">
+            <div className="py-3 px-3 mr-3 mb-3 flex-auto  flex flex-row items-center gap-2 border border-gray-300 rounded">
+              <HomeIcon className="w-[30px] h-[30px]" />
+              <p>Home</p>
+            </div>
+          </div>
+          <div className="bg-blue-100/50 rounded w-full p-10 text-blue-500 ">
+            <p className="font-bold mb-3">
+              Welcome to Swouch Transfer Webapp !
+            </p>
+            <p>
+              Connect your wallet to get started and transfer NFTs by batch for
+              any collection you own on Avalanche.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <div className="h-[50px] flex flex-row justify-end py-5">
-        <ConnectButton />
-      </div>
+      <Nav />
 
-      <div className="px-5 flex flex-row  gap-5 h-[calc(100vh_-_70px)] ">
-        <ScrollArea
-          type="always"
-          scrollbars="vertical"
-          style={{ height: "100%", width: 300, paddingRight: 15 }}
-        >
-          <RadioCards.Root
-            columns={{ initial: "1" }}
-            value={selectedCollectionAddress}
-            onValueChange={(value) => setSelectCollectionAddress(value)}
+      <div className="flex flex-row items-start gap-10 px-10">
+        <div className="flex flex-col w-[300px] h-[calc(100vh_-_80px)]">
+          <div className="py-3 px-3 mr-3 mb-3 flex-auto  flex flex-row items-center gap-2 border border-gray-200 rounded">
+            <HomeIcon className="ml-1 w-[30px] h-[30px]" />
+            <p>Home</p>
+          </div>
+
+          <ScrollArea
+            type="always"
+            scrollbars="vertical"
+            style={{ height: "100%", width: 300, paddingRight: 15 }}
           >
-            {data?.collections.map((collection, index) => (
-              <RadioCards.Item
-                value={collection.contract.address}
-                key={collection.contract.address}
-              >
-                <div className="w-full flex flex-row justify-start items-center gap-1 overflow-hidden ">
-                  <Avatar
-                    src={collection.image.thumbnailUrl}
-                    fallback={collection?.name[0]}
-                    radius="full"
-                  />
+            <RadioCards.Root
+              columns={{ initial: "1" }}
+              value={selectedCollectionAddress}
+              onValueChange={(value) => setSelectCollectionAddress(value)}
+            >
+              {data?.collections.map((collection, index) => (
+                <RadioCards.Item
+                  value={collection.contract.address}
+                  key={collection.contract.address}
+                >
+                  <div className="w-full flex flex-row justify-start items-center gap-1 overflow-hidden ">
+                    <Avatar
+                      src={collection.image.thumbnailUrl}
+                      fallback={collection?.name[0]}
+                      radius="full"
+                    />
 
-                  <div className="overflow-hidden flex-auto ">
-                    <div className="flex flex-row justify-between gap-1">
-                      <p className="font-bold">{collection.name}</p>
-                      <Badge color="blue">
-                        {collection.numDistinctTokensOwned}
-                      </Badge>
+                    <div className="overflow-hidden flex-auto ">
+                      <div className="flex flex-row justify-between gap-1">
+                        <p className="font-bold">{collection.name}</p>
+                        <Badge color="blue">
+                          {collection.numDistinctTokensOwned}
+                        </Badge>
+                      </div>
+                      <Code>
+                        {collection.contract.address.slice(0, 5)}...
+                        {collection.contract.address.slice(-4)}
+                      </Code>
                     </div>
-                    <Code>
-                      {collection.contract.address.slice(0, 5)}...
-                      {collection.contract.address.slice(-4)}
-                    </Code>
                   </div>
-                </div>
-              </RadioCards.Item>
-            ))}
-          </RadioCards.Root>
-        </ScrollArea>
+                </RadioCards.Item>
+              ))}
+            </RadioCards.Root>
+          </ScrollArea>
+        </div>
 
         {/* <Grid columns={{ initial: "2", sm: "3" }} gap="3" width="auto"> */}
 
@@ -92,13 +113,17 @@ export default function Home() {
           <NftTable
             nfts={nftData.ownedNfts}
             contract={nftData.ownedNfts[0].contractMetadata}
+            contractAddress={nftData.ownedNfts[0].contract.address}
           />
         ) : (
-          <div className="flex flex-col gap-2 flex-auto">
-            <span className="bg-gray-200 h-[35px] w-full rounded animate-pulse" />
-            <span className="bg-gray-200 h-[25px] w-full rounded animate-pulse" />
-            <span className="bg-gray-200 h-[25px] w-full rounded animate-pulse" />
-            <span className="bg-gray-200 h-[25px] w-full rounded animate-pulse" />
+          <div className="flex flex-col flex-auto">
+            <span className="bg-gray-200 h-[30px] w-full rounded animate-pulse" />
+            <hr className="my-3" />
+            <span className="bg-gray-200 h-[40px] w-full rounded animate-pulse" />
+            <hr className="my-3" />
+            <span className="bg-gray-200 h-[40px] w-full rounded animate-pulse" />
+            <hr className="my-3" />
+            <span className="bg-gray-200 h-[40px] w-full rounded animate-pulse" />
           </div>
         )}
       </div>

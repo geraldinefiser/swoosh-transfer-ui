@@ -1,17 +1,27 @@
-import { Avatar, Box, Checkbox, Flex, Separator, Text } from "@radix-ui/themes";
+import { Avatar } from "@radix-ui/themes";
 import { Fragment, useState } from "react";
 import { CheckIcon } from "@heroicons/react/24/solid";
 import { useMultiSelect } from "@/hooks/useMultiSelect";
+import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
+import TransferDialog from "./transferDialog";
 
-export default function NftTable({ nfts, contract }) {
+export default function NftTable({ nfts, contract, contractAddress }) {
   const { selectedArray: selectedNfts, handleCheck } = useMultiSelect(
     nfts.map((nft) => nft.id.tokenId)
   );
+  console.log(nfts);
 
   return (
     <div className="flex flex-col flex-auto">
-      <h3 className="text-lg font-bold">{contract.name}</h3>
-      <Separator my="3" size="4" />
+      <div className="flex flex-row justify-between items-center">
+        <h3 className="text-lg font-bold mr-auto ">{contract.name}</h3>
+
+        <TransferDialog
+          contractAddress={contractAddress}
+          selectedNfts={selectedNfts}
+        />
+      </div>
+      <hr className="my-3" />
       {nfts.map((nft, index) => (
         <Fragment key={nft.id.tokenId}>
           <label
@@ -35,14 +45,14 @@ export default function NftTable({ nfts, contract }) {
 
             <Avatar
               size="3"
-              src={nft.media[0].thumbnail}
+              src={nft.media[0].thumbnail ?? nft.media[0].gateway}
               fallback="T"
               className="select-none"
             />
             <p className="font-bold select-none">{nft.metadata.name}</p>
           </label>
 
-          <Separator my="3" size="4" />
+          <hr className="my-3" />
         </Fragment>
       ))}
     </div>
