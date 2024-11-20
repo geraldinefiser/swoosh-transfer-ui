@@ -15,7 +15,7 @@ export default function Home() {
   const { data } = useSWR(
     address ? `/api/fetch-collections?for_address=${address}` : null,
     fetcher,
-    { focusThrottleInterval: 3600000 }
+    { focusThrottleInterval: 60000, dedupingInterval: 60000 }
   );
 
   const [selectedCollectionAddress, setSelectCollectionAddress] = useState(
@@ -27,7 +27,7 @@ export default function Home() {
       ? `/api/fetch-nfts?for_address=${address}&for_collection=${selectedCollectionAddress}`
       : null,
     fetcher,
-    { focusThrottleInterval: 3600000 }
+    { focusThrottleInterval: 60000, dedupingInterval: 60000 }
   );
 
   if (!address) {
