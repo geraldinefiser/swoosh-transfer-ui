@@ -9,10 +9,15 @@ export default async function handler(req, res) {
 
   const url = `https://avax-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}/getNFTsForOwner?owner=${for_address}&contractAddresses[]=${for_collection}&pageSize=10&pageKey=${for_pageKey}`;
 
+  const vercelDomain = process.env.VERCEL_URL;
   switch (req.method) {
     case "GET":
       try {
-        const response = await fetch(url);
+        const response = await fetch(url, {
+          headers: {
+            Origin: vercelDomain, // Replace with your actual origin domain
+          },
+        });
         const fetchedNfts = await response.json();
 
         // const fetchedNfts = FakeJsonData;
