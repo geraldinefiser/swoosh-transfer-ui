@@ -15,7 +15,8 @@ const cspHeader = `
       data:
       https://*.walletconnect.com
       https://res.cloudinary.com/alchemyapi/
-      https://ipfs.io/;
+      https://ipfs.io/
+      https://nft-cdn.alchemy.com;
     font-src 'self';
     object-src 'none';
     base-uri 'self';

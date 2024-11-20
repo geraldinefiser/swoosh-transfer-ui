@@ -25,8 +25,7 @@ export function useMultiSelect(fullArray) {
       } else {
         idsInBetween = fullArray.slice(clickedIndex, prevIndex + 1);
       }
-      console.log(prevIndex, clickedIndex);
-      console.log(idsInBetween);
+
 
       if (wasChecked(clickedId)) {
         // deselect all in between

@@ -110,8 +110,7 @@ export default function Home() {
         {nftData ? (
           <NftTable
             nfts={nftData.ownedNfts}
-            contract={nftData.ownedNfts[0].contractMetadata}
-            contractAddress={nftData.ownedNfts[0].contract.address}
+            contract={nftData.ownedNfts[0].contract}
             mutateNfts={mutateNfts}
           />
         ) : (

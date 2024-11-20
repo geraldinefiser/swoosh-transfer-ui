@@ -53,12 +53,12 @@ export default function TransferDialog({
   const handleTransfer = (e) => {
     e.preventDefault();
     const receiverAddress = receiver.current.value;
-    console.log("RA", receiverAddress);
+
     if (!isApproved) {
       alert("You need to approve the contract first");
       return;
     }
-    console.log("RA", isAddress(receiverAddress));
+
     if (!isAddress(receiverAddress)) {
       receiver.current.value = "";
       receiver.current.focus();
