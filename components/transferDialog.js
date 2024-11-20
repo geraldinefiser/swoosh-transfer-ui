@@ -2,7 +2,7 @@ import {
   InformationCircleIcon,
   PaperAirplaneIcon,
 } from "@heroicons/react/24/outline";
-import bulkSend from "@/utils/bulkSend.json";
+import bulkSend from "@/utils/BulkSend.json";
 
 import { useEffect, useRef } from "react";
 import { erc721Abi, isAddress } from "viem";
