@@ -4,9 +4,18 @@
 const cspHeader = `
     default-src 'self';
     script-src 'self' 'unsafe-eval' 'unsafe-inline';
-    connect-src 'self' https://avax-mainnet.g.alchemy.com https://*.walletconnect.org;
+    connect-src 'self' 
+      https://avax-mainnet.g.alchemy.com 
+      https://*.walletconnect.org
+      https://*.walletconnect.com;
     style-src 'self' 'unsafe-inline';
-    img-src 'self' blob: data:;
+    img-src 
+      'self' 
+      blob: 
+      data:
+      https://*.walletconnect.com
+      https://res.cloudinary.com/alchemyapi/
+      https://ipfs.io/;
     font-src 'self';
     object-src 'none';
     base-uri 'self';

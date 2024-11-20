@@ -43,7 +43,7 @@ export default function Home() {
           </div>
           <div className="bg-blue-100/50 rounded w-full p-10 text-blue-500 ">
             <p className="font-bold mb-3">
-              Welcome to Swouch Transfer Webapp !
+              Welcome to Swouch Transfer WebApp !
             </p>
             <p>
               Connect your wallet to get started and transfer NFTs by batch for
