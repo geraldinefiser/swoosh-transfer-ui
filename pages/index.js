@@ -15,19 +15,19 @@ export default function Home() {
   const { data } = useSWR(
     address ? `/api/fetch-collections?for_address=${address}` : null,
     fetcher,
-    { focusThrottleInterval: 60000, dedupingInterval: 60000 }
+    { focusThrottleInterval: 120000, dedupingInterval: 120000 }
   );
 
   const [selectedCollectionAddress, setSelectCollectionAddress] = useState(
     data?.collections[0].contract.address
   );
 
-  const { data: nftData } = useSWR(
+  const { data: nftData, mutate: mutateNfts } = useSWR(
     address && selectedCollectionAddress
       ? `/api/fetch-nfts?for_address=${address}&for_collection=${selectedCollectionAddress}`
       : null,
     fetcher,
-    { focusThrottleInterval: 60000, dedupingInterval: 60000 }
+    { focusThrottleInterval: 120000, dedupingInterval: 120000 }
   );
 
   if (!address) {
@@ -61,10 +61,10 @@ export default function Home() {
 
       <div className="flex flex-row items-start gap-10 px-10">
         <div className="flex flex-col w-[300px] h-[calc(100vh_-_80px)]">
-          <div className="py-3 px-3 mr-3 mb-3 flex-auto  flex flex-row items-center gap-2 border border-gray-200 rounded">
+          {/* <div className="py-3 px-3 mr-3 mb-3 flex-auto  flex flex-row items-center gap-2 border border-gray-200 rounded">
             <HomeIcon className="ml-1 w-[30px] h-[30px]" />
             <p>Home</p>
-          </div>
+          </div> */}
 
           <ScrollArea
             type="always"
@@ -114,6 +114,7 @@ export default function Home() {
             nfts={nftData.ownedNfts}
             contract={nftData.ownedNfts[0].contractMetadata}
             contractAddress={nftData.ownedNfts[0].contract.address}
+            mutateNfts={mutateNfts}
           />
         ) : (
           <div className="flex flex-col flex-auto">

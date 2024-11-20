@@ -5,20 +5,25 @@ import { useMultiSelect } from "@/hooks/useMultiSelect";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import TransferDialog from "./transferDialog";
 
-export default function NftTable({ nfts, contract, contractAddress }) {
+export default function NftTable({
+  nfts,
+  contract,
+  contractAddress,
+  mutateNfts,
+}) {
   const { selectedArray: selectedNfts, handleCheck } = useMultiSelect(
     nfts.map((nft) => nft.id.tokenId)
   );
-  console.log(nfts);
 
   return (
     <div className="flex flex-col flex-auto">
-      <div className="flex flex-row justify-between items-center">
-        <h3 className="text-lg font-bold mr-auto ">{contract.name}</h3>
+      <div className="flex flex-col md:flex-row gap-2 justify-start items-center">
+        <h3 className="text-lg font-bold ">{contract.name}</h3>
 
         <TransferDialog
           contractAddress={contractAddress}
           selectedNfts={selectedNfts}
+          mutateNfts={mutateNfts}
         />
       </div>
       <hr className="my-3" />
