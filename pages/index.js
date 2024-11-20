@@ -42,9 +42,7 @@ export default function Home() {
             </div>
           </div>
           <div className="bg-blue-100/50 rounded w-full p-10 text-blue-500 ">
-            <p className="font-bold mb-3">
-              Welcome to Swouch Transfer WebApp !
-            </p>
+            <p className="font-bold mb-3">Welcome to Token Swoosh WebApp !</p>
             <p>
               Connect your wallet to get started and transfer NFTs by batch for
               any collection you own on Avalanche.
