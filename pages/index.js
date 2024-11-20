@@ -29,7 +29,7 @@ export default function Home() {
   );
 
   useEffect(() => {
-    if (data.collections.length > 0 && !selectedCollectionAddress) {
+    if (data?.collections?.length > 0 && !selectedCollectionAddress) {
       setSelectCollectionAddress(data.collections[0].contract.address);
     }
   }, [data, selectedCollectionAddress]);
