@@ -1,17 +1,7 @@
-import Nav from "@/components/nav";
 import { HomeIcon } from "@heroicons/react/24/outline";
-import { useRouter } from "next/router";
-import { useAccount } from "wagmi";
+import Nav from "./nav";
 
-export default function Home() {
-  const router = useRouter();
-  console.log(router);
-  const { address } = useAccount();
-
-  if (address) {
-    router.push("/dashboard");
-  }
-
+export default function WalletWithNoCollections() {
   return (
     <div>
       <Nav />
@@ -29,6 +19,10 @@ export default function Home() {
               Connect your wallet to get started and transfer batches of NFTs of
               any collection you own on Avalanche.
             </p>
+          </div>
+          <div className="bg-orange-100/50 rounded w-full p-10 text-orange-500 ">
+            <p className="font-bold mb-3">No NFTs to transfer in this wallet</p>
+            <p>Connect your another wallet</p>
           </div>
         </div>
       </div>
