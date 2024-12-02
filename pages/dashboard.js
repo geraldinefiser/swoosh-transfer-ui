@@ -18,9 +18,7 @@ export default function Dashboard() {
 
   const getKey = (pageIndex, previousPageData) => {
     if (!address) return null;
-    console.log("1. PI", pageIndex);
-    console.log("2. PPD", previousPageData);
-    console.log("3. PK", previousPageData?.pageKey);
+
     // reached the end
     if (previousPageData && !previousPageData.pageKey) return null;
 
@@ -35,7 +33,6 @@ export default function Dashboard() {
     focusThrottleInterval: 120000,
     dedupingInterval: 120000,
   });
-  console.log("DATA", data);
 
   const [selectedCollectionAddress, setSelectCollectionAddress] = useState();
 

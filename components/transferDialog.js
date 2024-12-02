@@ -4,15 +4,12 @@ import {
 } from "@heroicons/react/24/outline";
 import bulkSend from "@/utils/BulkSend.json";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { erc721Abi, isAddress } from "viem";
-import {
-  useAccount,
-  useReadContract,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { useAccount } from "wagmi";
 import { Badge, Callout } from "@radix-ui/themes";
+import { useApprovalStatus } from "@/hooks/useApprovalStatus";
+import { useTransferStatus } from "@/hooks/useTransferStatus";
 
 const BulkSendCA = "0xe141058cceb71a1c486987d2bfb18b5e1fd4d93f";
 
@@ -24,37 +21,18 @@ export default function TransferDialog({
   const receiver = useRef(null);
   const { address: userAddress } = useAccount();
 
-  const { data: isApproved, refetch } = useReadContract({
-    abi: erc721Abi,
-    address: contractAddress,
-    functionName: "isApprovedForAll",
-    args: [userAddress, BulkSendCA],
-    query: { enabled: Boolean(userAddress) },
-  });
+  const { approvalStatus, writeApprovalContract } = useApprovalStatus(
+    userAddress,
+    contractAddress
+  );
 
-  const {
-    data: ApprovalHash,
-    writeApprovalContract,
-    isApprovalPending,
-  } = useWriteContract();
-
-  const { isLoading: isApprovalConfirming, isSuccess: isApprovalConfirmed } =
-    useWaitForTransactionReceipt({
-      ApprovalHash,
-    });
-
-  const { data: hash, writeContract, isPending, reset } = useWriteContract();
-
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash,
-    });
+  const { writeStatus, writeContract } = useTransferStatus(mutateNfts);
 
   const handleTransfer = (e) => {
     e.preventDefault();
     const receiverAddress = receiver.current.value;
 
-    if (!isApproved) {
+    if (approvalStatus !== "approved") {
       alert("You need to approve the contract first");
       return;
     }
@@ -76,40 +54,20 @@ export default function TransferDialog({
     });
   };
 
-  useEffect(() => {
-    if (isApprovalConfirmed) {
-      refetch();
-    }
-  }, [isApprovalConfirmed, refetch]);
-
-  useEffect(() => {
-    if (isConfirmed) {
-      mutateNfts();
-      setTimeout(() => {
-        reset();
-      }, 5000);
-    }
-  }, [isConfirmed, mutateNfts, reset]);
-
   return (
     <>
-      {(isApprovalPending ||
-        isApprovalConfirming ||
-        isPending ||
-        isConfirming) && (
+      {(approvalStatus === "loading" || writeStatus === "loading") && (
         <div className="fixed top-1/4 right-2 md:right-5">
           <Callout.Root color="orange">
             <Callout.Icon>
               <InformationCircleIcon className="w-3 h-3 text-orange-600" />
             </Callout.Icon>
-            <Callout.Text>
-              Transaction is{" "}
-              {isApprovalPending || isPending ? "pending" : "confirming"}...
-            </Callout.Text>
+            <Callout.Text>Transaction is pending...</Callout.Text>
           </Callout.Root>
         </div>
       )}
-      {isConfirmed && (
+
+      {writeStatus == "confirmed" && (
         <div className="fixed top-1/4 right-2 md:right-5">
           <Callout.Root color="green">
             <Callout.Icon>
@@ -120,40 +78,44 @@ export default function TransferDialog({
         </div>
       )}
 
-      {isApproved ? (
+      {approvalStatus === "approved" ? (
         <div className="md:mr-auto">
           <Badge color="blue">Contract Approved</Badge>
         </div>
       ) : (
         <button
           type="button"
-          className="ml-auto rounded-full py-2 px-5 mr-2 bg-orange-100 text-orange-500"
+          className={`ml-auto shrink-0 rounded-full py-2 px-5 mr-2 bg-orange-100 text-orange-500 ${
+            approvalStatus === "loading" && "opacity-50 cursor-not-allowed"
+          }`}
+          disabled={approvalStatus === "loading"}
           onClick={(e) => {
             e.preventDefault();
+
             writeApprovalContract({
               abi: erc721Abi,
-              contractAddress: contractAddress,
+              address: contractAddress,
               functionName: "setApprovalForAll",
               args: [BulkSendCA, true],
             });
           }}
         >
-          {isPending ? (
-            "Confirming..."
-          ) : (
-            <>
-              {isConfirming && <span>Waiting for confirmation...</span>}
-              {isConfirmed && <span>Transaction confirmed.</span>}
-              {!isConfirming && !isConfirmed && <span>Approve contract</span>}
-            </>
-          )}
+          <>
+            {writeStatus === "loading" && (
+              <span>Waiting for confirmation...</span>
+            )}
+
+            {writeStatus === "confirmed" && <span>Transaction confirmed.</span>}
+            {writeStatus === "idle" && <span>Approve contract</span>}
+          </>
         </button>
       )}
 
       <form
         onSubmit={(e) => handleTransfer(e)}
-        className={`flex flex-row bg-blue-50 rounded-full px-1 py-1 ${
-          !isApproved && "opacity-50 cursor-not-allowed"
+        className={`shrink w-[530px] flex flex-row bg-blue-50 rounded-full px-1 py-1 ${
+          (approvalStatus !== "approved" || writeStatus === "loading") &&
+          "opacity-50 cursor-not-allowed"
         }`}
       >
         <input
@@ -162,7 +124,7 @@ export default function TransferDialog({
           type="text"
           name="receiver"
           placeholder="wallet addy"
-          className="bg-transparent pl-3 outline-none"
+          className="w-full shrink bg-transparent pl-3 outline-none font-mono text-sm"
         />
 
         <button
