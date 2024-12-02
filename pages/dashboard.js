@@ -7,6 +7,7 @@ import { Avatar, RadioCards, Badge, Code, ScrollArea } from "@radix-ui/themes";
 
 import { useEffect, useState } from "react";
 import useSWR from "swr";
+import useSWRInfinite from "swr/infinite";
 import { useAccount } from "wagmi";
 import WalletWithNoCollections from "@/components/walletWithNoCollections";
 
@@ -15,11 +16,26 @@ const fetcher = (...args) => fetch(...args).then((res) => res.json());
 export default function Dashboard() {
   const { address } = useAccount();
 
-  const { data } = useSWR(
-    address ? `/api/fetch-collections?for_address=${address}` : null,
-    fetcher,
-    { focusThrottleInterval: 120000, dedupingInterval: 120000 }
-  );
+  const getKey = (pageIndex, previousPageData) => {
+    if (!address) return null;
+    console.log("1. PI", pageIndex);
+    console.log("2. PPD", previousPageData);
+    console.log("3. PK", previousPageData?.pageKey);
+    // reached the end
+    if (previousPageData && !previousPageData.pageKey) return null;
+
+    // first page, we don't have `previousPageData`
+    if (pageIndex === 0) return `/api/fetch-collections?for_address=${address}`;
+
+    // add the cursor to the API endpoint
+    return `/api/fetch-collections?for_address=${address}&pageKey=${previousPageData.pageKey}`;
+  };
+
+  const { data, size, setSize, isLoading } = useSWRInfinite(getKey, fetcher, {
+    focusThrottleInterval: 120000,
+    dedupingInterval: 120000,
+  });
+  console.log("DATA", data);
 
   const [selectedCollectionAddress, setSelectCollectionAddress] = useState();
 
@@ -37,6 +53,11 @@ export default function Dashboard() {
     }
   }, [data, selectedCollectionAddress]);
 
+  const totalCount = data?.[data.length - 1].totalCount;
+  const collectionsLoadedCount = data?.flatMap(
+    (serie) => serie.collections
+  ).length;
+
   if (data?.collections?.length === 0) {
     return <WalletWithNoCollections />;
   }
@@ -47,10 +68,28 @@ export default function Dashboard() {
 
       <div className="flex flex-row items-start gap-10 px-10">
         <div className="flex flex-col w-[300px] h-[calc(100vh_-_80px)]">
-          <div className="flex flex-row items-center border border-gray-300 rounded px-2 mr-3 mb-3">
-            <MagnifyingGlassIcon className="w-4 h-4 inline-block text-gray-500" />
+          <div className="relative flex flex-col items-start rounded mr-4 mb-3 p-4 bg-gray-100">
+            <p className="font-bold">Collections in Wallet</p>
+
+            <p className="text-sm">
+              {collectionsLoadedCount} listed / {totalCount}
+            </p>
+
+            {totalCount > collectionsLoadedCount && (
+              <button
+                disabled={isLoading}
+                onClick={() => setSize(size + 1)}
+                className="absolute bottom-4 right-4 bg-blue-500 text-white px-2 text-xs py-1 rounded"
+              >
+                Load more
+              </button>
+            )}
+          </div>
+
+          <div className="relative flex flex-row items-center border border-gray-300 rounded mr-4 mb-3">
+            <MagnifyingGlassIcon className=" w-4 h-4 absolute top-4 left-4 text-gray-500" />
             <input
-              className="ml-2 h-[30px] w-full"
+              className="pl-12 bg-transparent h-[50px] w-full"
               type="text"
               placeholder="Search collections..."
             />
@@ -66,33 +105,35 @@ export default function Dashboard() {
               value={selectedCollectionAddress}
               onValueChange={(value) => setSelectCollectionAddress(value)}
             >
-              {data?.collections.map((collection, index) => (
-                <RadioCards.Item
-                  value={collection.contract.address}
-                  key={collection.contract.address}
-                >
-                  <div className="w-full flex flex-row justify-start items-center gap-1 overflow-hidden ">
-                    <Avatar
-                      src={collection.image.thumbnailUrl}
-                      fallback={collection?.name[0]}
-                      radius="full"
-                    />
+              {data
+                ?.flatMap((serie) => serie.collections)
+                .map((collection, index) => (
+                  <RadioCards.Item
+                    value={collection.contract.address}
+                    key={collection.contract.address}
+                  >
+                    <div className="w-full flex flex-row justify-start items-center gap-1 overflow-hidden ">
+                      <Avatar
+                        src={collection.image.thumbnailUrl}
+                        fallback={collection?.name[0]}
+                        radius="full"
+                      />
 
-                    <div className="overflow-hidden flex-auto ">
-                      <div className="flex flex-row justify-between gap-1">
-                        <p className="font-bold">{collection.name}</p>
-                        <Badge color="blue">
-                          {collection.numDistinctTokensOwned}
-                        </Badge>
+                      <div className="overflow-hidden flex-auto ">
+                        <div className="flex flex-row justify-between gap-1">
+                          <p className="font-bold">{collection.name}</p>
+                          <Badge color="blue">
+                            {collection.numDistinctTokensOwned}
+                          </Badge>
+                        </div>
+                        <Code>
+                          {collection.contract.address.slice(0, 5)}...
+                          {collection.contract.address.slice(-4)}
+                        </Code>
                       </div>
-                      <Code>
-                        {collection.contract.address.slice(0, 5)}...
-                        {collection.contract.address.slice(-4)}
-                      </Code>
                     </div>
-                  </div>
-                </RadioCards.Item>
-              ))}
+                  </RadioCards.Item>
+                ))}
             </RadioCards.Root>
           </ScrollArea>
         </div>
