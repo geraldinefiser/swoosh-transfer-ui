@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 
 export default function Home() {
   const router = useRouter();
-  console.log(router);
+
   const { address } = useAccount();
 
   if (address) {

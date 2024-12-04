@@ -113,7 +113,7 @@ export default function TransferDialog({
 
       <form
         onSubmit={(e) => handleTransfer(e)}
-        className={`shrink w-[530px] flex flex-row bg-blue-50 rounded-full px-1 py-1 ${
+        className={`flex flex-row bg-blue-50 rounded-full px-1 py-1 ${
           (approvalStatus !== "approved" || writeStatus === "loading") &&
           "opacity-50 cursor-not-allowed"
         }`}
@@ -124,7 +124,7 @@ export default function TransferDialog({
           type="text"
           name="receiver"
           placeholder="wallet addy"
-          className="w-full shrink bg-transparent pl-3 outline-none font-mono text-sm"
+          className="bg-transparent pl-3 outline-none font-mono text-sm"
         />
 
         <button

@@ -34,7 +34,7 @@ export default function Dashboard() {
     dedupingInterval: 120000,
   });
 
-  const [selectedCollectionAddress, setSelectCollectionAddress] = useState();
+  const [selectedCollectionAddress, setSelectCollectionAddress] = useState("");
 
   const { data: nftData, mutate: mutateNfts } = useSWR(
     address && selectedCollectionAddress
@@ -50,6 +50,12 @@ export default function Dashboard() {
     }
   }, [data, selectedCollectionAddress]);
 
+  useEffect(() => {
+    if (nftData?.ownedNfts?.length === 0) {
+      setSelectCollectionAddress("");
+    }
+  }, [nftData?.ownedNfts]);
+
   const totalCount = data?.[data.length - 1].totalCount;
   const collectionsLoadedCount = data?.flatMap(
     (serie) => serie.collections
@@ -58,6 +64,9 @@ export default function Dashboard() {
   if (data?.collections?.length === 0) {
     return <WalletWithNoCollections />;
   }
+
+  console.log("selected collection", selectedCollectionAddress);
+  console.log("NFT data", nftData);
 
   return (
     <div>
@@ -137,21 +146,26 @@ export default function Dashboard() {
 
         {/* <Grid columns={{ initial: "2", sm: "3" }} gap="3" width="auto"> */}
 
-        {nftData ? (
+        {nftData?.ownedNfts?.length > 0 ? (
           <NftTable
             nfts={nftData.ownedNfts}
             contract={nftData.ownedNfts[0].contract}
             mutateNfts={mutateNfts}
           />
         ) : (
-          <div className="flex flex-col flex-auto">
-            <span className="bg-gray-200 h-[30px] w-full rounded animate-pulse" />
-            <hr className="my-3" />
-            <span className="bg-gray-200 h-[40px] w-full rounded animate-pulse" />
-            <hr className="my-3" />
-            <span className="bg-gray-200 h-[40px] w-full rounded animate-pulse" />
-            <hr className="my-3" />
-            <span className="bg-gray-200 h-[40px] w-full rounded animate-pulse" />
+          <div className="flex flex-col gap-2 w-full">
+            <div className="bg-blue-100/50 rounded w-full p-10 text-blue-500 ">
+              <p>Select a collection to get started</p>
+            </div>
+            <div className="flex flex-col flex-auto">
+              <span className="bg-gray-200 h-[30px] w-full rounded animate-pulse" />
+              <hr className="my-3" />
+              <span className="bg-gray-200 h-[40px] w-full rounded animate-pulse" />
+              <hr className="my-3" />
+              <span className="bg-gray-200 h-[40px] w-full rounded animate-pulse" />
+              <hr className="my-3" />
+              <span className="bg-gray-200 h-[40px] w-full rounded animate-pulse" />
+            </div>
           </div>
         )}
       </div>
