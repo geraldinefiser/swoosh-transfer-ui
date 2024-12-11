@@ -1,15 +1,14 @@
-import DefaultHomeComponent from "@/components/walletWithNoCollections";
 import Nav from "@/components/nav";
 import NftTable from "@/components/nftTable";
+import WalletWithNoCollections from "@/components/walletWithNoCollections";
+import CollectionList from "@/components/collectionList";
 
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { Avatar, RadioCards, Badge, Code, ScrollArea } from "@radix-ui/themes";
 
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
 import { useAccount } from "wagmi";
-import WalletWithNoCollections from "@/components/walletWithNoCollections";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -45,28 +44,29 @@ export default function Dashboard() {
   );
 
   useEffect(() => {
-    if (data?.collections?.length > 0 && !selectedCollectionAddress) {
-      setSelectCollectionAddress(data.collections[0].contract.address);
-    }
-  }, [data, selectedCollectionAddress]);
-
-  useEffect(() => {
     if (nftData?.ownedNfts?.length === 0) {
       setSelectCollectionAddress("");
     }
   }, [nftData?.ownedNfts]);
 
-  const totalCount = data?.[data.length - 1].totalCount;
+  const totalCount = data?.[data.length - 1]?.totalCount;
   const collectionsLoadedCount = data?.flatMap(
     (serie) => serie.collections
   ).length;
 
-  if (data?.collections?.length === 0) {
-    return <WalletWithNoCollections />;
+  if (!data) {
+    return (
+      <div>
+        <Nav />
+
+        <div className="flex flex-row items-start gap-10 px-10">Loading</div>
+      </div>
+    );
   }
 
-  console.log("selected collection", selectedCollectionAddress);
-  console.log("NFT data", nftData);
+  if (data?.[0]?.collections?.length === 0) {
+    return <WalletWithNoCollections />;
+  }
 
   return (
     <div>
@@ -83,6 +83,7 @@ export default function Dashboard() {
 
             {totalCount > collectionsLoadedCount && (
               <button
+                type="button"
                 disabled={isLoading}
                 onClick={() => setSize(size + 1)}
                 className="absolute bottom-4 right-4 bg-blue-500 text-white px-2 text-xs py-1 rounded"
@@ -101,47 +102,11 @@ export default function Dashboard() {
             />
           </div>
 
-          <ScrollArea
-            type="always"
-            scrollbars="vertical"
-            style={{ height: "100%", width: 300, paddingRight: 15 }}
-          >
-            <RadioCards.Root
-              columns={{ initial: "1" }}
-              value={selectedCollectionAddress}
-              onValueChange={(value) => setSelectCollectionAddress(value)}
-            >
-              {data
-                ?.flatMap((serie) => serie.collections)
-                .map((collection, index) => (
-                  <RadioCards.Item
-                    value={collection.contract.address}
-                    key={collection.contract.address}
-                  >
-                    <div className="w-full flex flex-row justify-start items-center gap-1 overflow-hidden ">
-                      <Avatar
-                        src={collection.image.thumbnailUrl}
-                        fallback={collection?.name[0]}
-                        radius="full"
-                      />
-
-                      <div className="overflow-hidden flex-auto ">
-                        <div className="flex flex-row justify-between gap-1">
-                          <p className="font-bold">{collection.name}</p>
-                          <Badge color="blue">
-                            {collection.numDistinctTokensOwned}
-                          </Badge>
-                        </div>
-                        <Code>
-                          {collection.contract.address.slice(0, 5)}...
-                          {collection.contract.address.slice(-4)}
-                        </Code>
-                      </div>
-                    </div>
-                  </RadioCards.Item>
-                ))}
-            </RadioCards.Root>
-          </ScrollArea>
+          <CollectionList
+            selectedCollectionAddress={selectedCollectionAddress}
+            setSelectCollectionAddress={setSelectCollectionAddress}
+            data={data}
+          />
         </div>
 
         {/* <Grid columns={{ initial: "2", sm: "3" }} gap="3" width="auto"> */}

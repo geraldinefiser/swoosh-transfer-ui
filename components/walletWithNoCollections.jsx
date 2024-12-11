@@ -13,13 +13,6 @@ export default function WalletWithNoCollections() {
           </div>
         </div>
         <div className="flex flex-col gap-5">
-          <div className="bg-blue-100/50 rounded w-full p-10 text-blue-500 ">
-            <p className="font-bold mb-3">Welcome to Token Swoosh WebApp !</p>
-            <p>
-              Connect your wallet to get started and transfer batches of NFTs of
-              any collection you own on Avalanche.
-            </p>
-          </div>
           <div className="bg-orange-100/50 rounded w-full p-10 text-orange-500 ">
             <p className="font-bold mb-3">No NFTs to transfer in this wallet</p>
             <p>Connect your another wallet</p>
