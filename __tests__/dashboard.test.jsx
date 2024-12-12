@@ -228,6 +228,7 @@ describe("Dashboard", () => {
       isLoading: false,
     });
     render(<Dashboard />);
+    expect(screen.getByText("3 listed / 3")).toBeDefined();
     expect(
       screen.queryByRole("button", { name: "Load more" })
     ).not.toBeInTheDocument();
@@ -250,6 +251,7 @@ describe("Dashboard", () => {
       isLoading: false,
     });
     render(<Dashboard />);
+    expect(screen.getByText("3 listed / 10")).toBeDefined();
     expect(
       screen.queryByRole("button", { name: "Load more" })
     ).toBeInTheDocument();
