@@ -10,7 +10,6 @@ import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
 import { useAccount } from "wagmi";
 import NftLoading from "@/components/nftLoading";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
