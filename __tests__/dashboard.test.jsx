@@ -215,4 +215,43 @@ describe("Dashboard", () => {
       expect(screen.getByTestId("mock-nft-loading")).toBeDefined();
     });
   });
+
+  it("does not show load more button if all collections have been fetched", async () => {
+    vi.mocked(useSWRInfinite).mockReturnValue({
+      data: [collectionsByOwner],
+      size: 1,
+      setSize: vi.fn(),
+      isLoading: false,
+    });
+    vi.mocked(useSWR).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    });
+    render(<Dashboard />);
+    expect(
+      screen.queryByRole("button", { name: "Load more" })
+    ).not.toBeInTheDocument();
+  });
+  it("shows load more button if not all collections have been fetched", async () => {
+    vi.mocked(useSWRInfinite).mockReturnValue({
+      data: [
+        {
+          ...collectionsByOwner,
+          totalCount: 10,
+          pageKey: "somePageKey",
+        },
+      ],
+      size: 1,
+      setSize: vi.fn(),
+      isLoading: false,
+    });
+    vi.mocked(useSWR).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    });
+    render(<Dashboard />);
+    expect(
+      screen.queryByRole("button", { name: "Load more" })
+    ).toBeInTheDocument();
+  });
 });
