@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
 import { useAccount } from "wagmi";
+import NftLoading from "@/components/nftLoading";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -35,7 +37,11 @@ export default function Dashboard() {
 
   const [selectedCollectionAddress, setSelectCollectionAddress] = useState("");
 
-  const { data: nftData, mutate: mutateNfts } = useSWR(
+  const {
+    data: nftData,
+    mutate: mutateNfts,
+    isLoading: isNftLoading,
+  } = useSWR(
     address && selectedCollectionAddress
       ? `/api/fetch-nfts?for_address=${address}&for_collection=${selectedCollectionAddress}`
       : null,
@@ -109,30 +115,21 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* <Grid columns={{ initial: "2", sm: "3" }} gap="3" width="auto"> */}
-
-        {nftData?.ownedNfts?.length > 0 ? (
+        {!selectedCollectionAddress ? (
+          <div className="flex flex-col gap-2 w-full">
+            <div className="bg-blue-100/50 rounded w-full p-10 text-blue-500 ">
+              <p>Select a collection to get started</p>
+            </div>
+          </div>
+        ) : isNftLoading ? (
+          <NftLoading />
+        ) : nftData?.ownedNfts?.length > 0 ? (
           <NftTable
             nfts={nftData.ownedNfts}
             contract={nftData.ownedNfts[0].contract}
             mutateNfts={mutateNfts}
           />
-        ) : (
-          <div className="flex flex-col gap-2 w-full">
-            <div className="bg-blue-100/50 rounded w-full p-10 text-blue-500 ">
-              <p>Select a collection to get started</p>
-            </div>
-            <div className="flex flex-col flex-auto">
-              <span className="bg-gray-200 h-[30px] w-full rounded animate-pulse" />
-              <hr className="my-3" />
-              <span className="bg-gray-200 h-[40px] w-full rounded animate-pulse" />
-              <hr className="my-3" />
-              <span className="bg-gray-200 h-[40px] w-full rounded animate-pulse" />
-              <hr className="my-3" />
-              <span className="bg-gray-200 h-[40px] w-full rounded animate-pulse" />
-            </div>
-          </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

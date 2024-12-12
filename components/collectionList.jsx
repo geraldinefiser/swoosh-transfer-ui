@@ -1,16 +1,10 @@
 import { Avatar, Badge, Code, RadioCards, ScrollArea } from "@radix-ui/themes";
-import { useEffect } from "react";
 
 export default function CollectionList({
   selectedCollectionAddress,
   setSelectCollectionAddress,
   data,
 }) {
-  useEffect(() => {
-    if (data?.collections?.length > 0 && !selectedCollectionAddress) {
-      setSelectCollectionAddress(data.collections[0].contract.address);
-    }
-  }, [data, selectedCollectionAddress]);
   return (
     <ScrollArea
       type="always"

@@ -1,11 +1,25 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { render } from "../test/test-utils";
-import { screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import Dashboard from "@/pages/dashboard";
 
 import { useAccount } from "wagmi";
 import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
+import { setupNFTApiMocks } from "@/test/nft-api-mock";
+
+const {
+  collectionsByOwner,
+  nftsByOwnerForContract,
+  collectionAddress,
+  collectionName,
+  numberNftOwned,
+} = setupNFTApiMocks();
+
+const buttonName = `${collectionName} ${numberNftOwned} ${collectionAddress.slice(
+  0,
+  5
+)}...${collectionAddress.slice(-4)}`;
 
 vi.mock(import("wagmi"), async (importOriginal) => {
   const actual = await importOriginal();
@@ -20,7 +34,6 @@ vi.mock("swr", () => {
   return { default: useSWR, useSWR };
 });
 
-// Mock swr/infinite
 vi.mock("swr/infinite", () => {
   const useSWRInfinite = vi.fn();
   return { default: useSWRInfinite, useSWRInfinite };
@@ -34,10 +47,8 @@ vi.mock("../components/nftTable", () => ({
   default: () => <div data-testid="mock-nft-table">Mock NFT Table</div>,
 }));
 
-vi.mock("../components/collectionList", () => ({
-  default: () => (
-    <div data-testid="mock-collection-list">Mock Collection List</div>
-  ),
+vi.mock("../components/nftLoading", () => ({
+  default: () => <div data-testid="mock-nft-loading">Mock NFT Loading</div>,
 }));
 
 vi.mock("../components/walletWithNoCollections", () => ({
@@ -57,16 +68,14 @@ describe("Dashboard", () => {
   });
 
   it("should renders the Nav component", () => {
-    vi.mocked(useSWRInfinite).mockReturnValue([
-      {
-        data: undefined,
-        size: 1,
-        setSize: vi.fn(),
-        isLoading: false,
-      },
-    ]);
+    vi.mocked(useSWRInfinite).mockReturnValue({
+      data: undefined,
+      size: 1,
+      setSize: vi.fn(),
+      isLoading: false,
+    });
     vi.mocked(useSWR).mockReturnValue({
-      nftData: undefined,
+      data: undefined,
       isLoading: false,
     });
     render(<Dashboard />);
@@ -87,7 +96,7 @@ describe("Dashboard", () => {
       isLoading: false,
     });
     vi.mocked(useSWR).mockReturnValue({
-      nftData: null,
+      data: undefined,
       isLoading: false,
     });
 
@@ -100,63 +109,110 @@ describe("Dashboard", () => {
 
   it("renders the collectionList component when wallet has collections and they are loaded", async () => {
     vi.mocked(useSWRInfinite).mockReturnValue({
-      data: [
-        {
-          collections: [
-            {
-              contract: {
-                address: "0x1234567890123456789012345678901234567890",
-                name: "Scribbles",
-              },
-              name: "Scribbles",
-            },
-          ],
-          totalCount: 1,
-          pageKey: null,
-        },
-      ],
+      data: [collectionsByOwner],
       size: 1,
       setSize: vi.fn(),
       isLoading: false,
     });
     vi.mocked(useSWR).mockReturnValue({
-      nftData: null,
+      data: null,
       isLoading: false,
     });
     render(<Dashboard />);
+
     await waitFor(() => {
-      expect(screen.getByTestId("mock-collection-list")).toBeDefined();
+      expect(
+        screen.getByRole("radio", {
+          name: buttonName,
+        })
+      ).toBeInTheDocument();
     });
   });
 
   it("renders a placeholder if no collection selected and collections are loaded", async () => {
     vi.mocked(useSWRInfinite).mockReturnValue({
-      data: [
-        {
-          collections: [
-            {
-              contract: {
-                address: "0x1234567890123456789012345678901234567890",
-                name: "Scribbles",
-              },
-              name: "Scribbles",
-            },
-          ],
-          totalCount: 1,
-          pageKey: null,
-        },
-      ],
+      data: [collectionsByOwner],
       size: 1,
       setSize: vi.fn(),
       isLoading: false,
     });
     vi.mocked(useSWR).mockReturnValue({
-      nftData: null,
+      data: undefined,
       isLoading: false,
     });
     render(<Dashboard />);
     await waitFor(() => {
-      expect(screen.getByTestId("mock-collection-list")).toBeDefined();
+      expect(
+        screen.getByRole("radio", {
+          name: buttonName,
+        })
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByText("Select a collection to get started")
+      ).toBeDefined();
+    });
+  });
+
+  it("renders the NFT Table when a collection is selected and NFTs are loaded", async () => {
+    vi.mocked(useSWRInfinite).mockReturnValue({
+      data: [collectionsByOwner],
+      size: 1,
+      setSize: vi.fn(),
+      isLoading: false,
+    });
+
+    vi.mocked(useSWR).mockReturnValue({
+      data: nftsByOwnerForContract,
+      isLoading: false,
+    });
+
+    render(<Dashboard />);
+
+    expect(
+      screen.getByText("Select a collection to get started")
+    ).toBeDefined();
+
+    const button = screen.getByRole("radio", {
+      name: buttonName,
+    });
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Select a collection to get started")
+      ).not.toBeInTheDocument();
+      expect(screen.getByTestId("mock-nft-table")).toBeDefined();
+    });
+  });
+
+  it("renders a loading skeleton when a collection is selected and NFTs are loading", async () => {
+    vi.mocked(useSWRInfinite).mockReturnValue({
+      data: [collectionsByOwner],
+      size: 1,
+      setSize: vi.fn(),
+      isLoading: false,
+    });
+
+    vi.mocked(useSWR).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    });
+
+    render(<Dashboard />);
+
+    expect(
+      screen.getByText("Select a collection to get started")
+    ).toBeDefined();
+
+    const button = screen.getByRole("radio", { name: buttonName });
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Select a collection to get started")
+      ).not.toBeInTheDocument();
+      expect(screen.getByTestId("mock-nft-loading")).toBeDefined();
     });
   });
 });

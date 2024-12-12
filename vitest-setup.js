@@ -4,3 +4,10 @@ import { cleanup } from "@testing-library/react";
 afterEach(() => {
   cleanup();
 });
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+global.ResizeObserver = ResizeObserverMock;
