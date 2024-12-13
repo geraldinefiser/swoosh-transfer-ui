@@ -5,6 +5,7 @@ import FakeCollectionsData from "@/utils/fakeCollectionsData.json";
 export default async function handler(req, res) {
   const { for_address, pageKey = null } = req.query;
   let url;
+
   if (pageKey) {
     url = ` https://avax-mainnet.g.alchemy.com/nft/v3/${process.env.ALCHEMY_API_KEY}/getCollectionsForOwner?owner=${for_address}&pageKey=${pageKey}`;
   } else {

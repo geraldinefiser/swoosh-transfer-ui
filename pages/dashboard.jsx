@@ -3,7 +3,7 @@ import NftTable from "@/components/nftTable";
 import WalletWithNoCollections from "@/components/walletWithNoCollections";
 import CollectionList from "@/components/collectionList";
 
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { HomeIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 import { useEffect, useState } from "react";
 import useSWR from "swr";
@@ -29,10 +29,14 @@ export default function Dashboard() {
     return `/api/fetch-collections?for_address=${address}&pageKey=${previousPageData.pageKey}`;
   };
 
-  const { data, size, setSize, isLoading } = useSWRInfinite(getKey, fetcher, {
-    focusThrottleInterval: 120000,
-    dedupingInterval: 120000,
-  });
+  const { data, size, setSize, isLoading, error } = useSWRInfinite(
+    getKey,
+    fetcher,
+    {
+      focusThrottleInterval: 120000,
+      dedupingInterval: 120000,
+    }
+  );
 
   const [selectedCollectionAddress, setSelectCollectionAddress] = useState("");
 
@@ -40,6 +44,7 @@ export default function Dashboard() {
     data: nftData,
     mutate: mutateNfts,
     isLoading: isNftLoading,
+    error: nftError,
   } = useSWR(
     address && selectedCollectionAddress
       ? `/api/fetch-nfts?for_address=${address}&for_collection=${selectedCollectionAddress}`
@@ -71,6 +76,31 @@ export default function Dashboard() {
 
   if (data?.[0]?.collections?.length === 0) {
     return <WalletWithNoCollections />;
+  }
+
+  if (data?.[0]?.error) {
+    return (
+      <div>
+        <Nav />
+
+        <div className="flex flex-row items-start gap-10 px-10">
+          <div className="flex flex-col w-[300px]">
+            <div className="py-3 px-3 mr-3 mb-3 flex-auto  flex flex-row items-center gap-2 border border-gray-300 rounded">
+              <HomeIcon className="w-[30px] h-[30px]" />
+              <p>Home</p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-5">
+            <div className="bg-orange-100/50 rounded w-full p-10 text-orange-500 ">
+              <p className="font-bold mb-3">
+                There was an error fetching your collections
+              </p>
+              <p>{data?.[0]?.error.message}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
