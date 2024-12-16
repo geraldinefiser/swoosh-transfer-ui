@@ -4,7 +4,7 @@ import {
 } from "@heroicons/react/24/outline";
 import bulkSend from "@/utils/BulkSend.json";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { erc721Abi, isAddress } from "viem";
 import { useAccount } from "wagmi";
 import { Badge, Callout } from "@radix-ui/themes";
@@ -18,6 +18,7 @@ export default function TransferDialog({
   selectedNfts,
   mutateNfts,
 }) {
+  const [error, setError] = useState("");
   const receiver = useRef(null);
   const { address: userAddress } = useAccount();
 
@@ -33,16 +34,18 @@ export default function TransferDialog({
     const receiverAddress = receiver.current.value;
 
     if (approvalStatus !== "approved") {
-      alert("You need to approve the contract first");
+      setError("You need to approve the contract first");
       return;
     }
 
     if (!isAddress(receiverAddress)) {
       receiver.current.value = "";
       receiver.current.focus();
-      alert(
+
+      setError(
         "The receiver wallet address is not a valid address. Make sure you copied the correct address."
       );
+
       return;
     }
 
@@ -56,6 +59,7 @@ export default function TransferDialog({
 
   return (
     <>
+      {error && <div>{error}</div>}
       {(approvalStatus === "loading" || writeStatus === "loading") && (
         <div className="fixed top-1/4 right-2 md:right-5">
           <Callout.Root color="orange">
