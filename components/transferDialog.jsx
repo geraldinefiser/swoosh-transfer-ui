@@ -71,7 +71,7 @@ export default function TransferDialog({
         </div>
       )}
 
-      {writeStatus == "confirmed" && (
+      {writeStatus === "confirmed" && (
         <div className="fixed top-1/4 right-2 md:right-5">
           <Callout.Root color="green">
             <Callout.Icon>

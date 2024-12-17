@@ -11,6 +11,34 @@ import useSWRInfinite from "swr/infinite";
 import { useAccount } from "wagmi";
 import NftLoading from "@/components/nftLoading";
 
+interface Contract {
+  address: string;
+  image: {
+    thumbnailUrl: string;
+  };
+  name: string;
+  numDistinctTokensOwned: string;
+}
+interface CollectionsData {
+  contracts: Contract[];
+  totalCount: number;
+  pageKey: string;
+}
+
+interface Nft {
+  tokenId: string;
+  contract: string;
+  name: string;
+  image: {
+    thumbnailUrl?: string;
+    cachedUrl?: string;
+  };
+}
+
+interface NftData {
+  ownedNfts: Nft[];
+}
+
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Dashboard() {
@@ -29,14 +57,11 @@ export default function Dashboard() {
     return `/api/fetch-collections?for_address=${address}&pageKey=${previousPageData.pageKey}`;
   };
 
-  const { data, size, setSize, isLoading, error } = useSWRInfinite(
-    getKey,
-    fetcher,
-    {
+  const { data, size, setSize, isLoading, error } =
+    useSWRInfinite<CollectionsData>(getKey, fetcher, {
       focusThrottleInterval: 120000,
       dedupingInterval: 120000,
-    }
-  );
+    });
 
   const [selectedCollectionAddress, setSelectCollectionAddress] = useState("");
 
@@ -45,7 +70,7 @@ export default function Dashboard() {
     mutate: mutateNfts,
     isLoading: isNftLoading,
     error: nftError,
-  } = useSWR(
+  } = useSWR<NftData>(
     address && selectedCollectionAddress
       ? `/api/fetch-nfts?for_address=${address}&for_collection=${selectedCollectionAddress}`
       : null,
@@ -61,7 +86,7 @@ export default function Dashboard() {
 
   const totalCount = data?.[data.length - 1]?.totalCount;
   const collectionsLoadedCount = data?.flatMap(
-    (serie) => serie.collections
+    (serie) => serie.contracts
   ).length;
 
   if (!data) {
@@ -74,7 +99,7 @@ export default function Dashboard() {
     );
   }
 
-  if (data?.[0]?.collections?.length === 0) {
+  if (data?.[0]?.contracts?.length === 0) {
     return <WalletWithNoCollections />;
   }
 

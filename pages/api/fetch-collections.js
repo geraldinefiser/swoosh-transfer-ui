@@ -7,18 +7,18 @@ export default async function handler(req, res) {
   let url;
 
   if (pageKey) {
-    url = ` https://avax-mainnet.g.alchemy.com/nft/v3/${process.env.ALCHEMY_API_KEY}/getCollectionsForOwner?owner=${for_address}&pageKey=${pageKey}`;
+    url = ` https://avax-mainnet.g.alchemy.com/nft/v3/${process.env.ALCHEMY_API_KEY}/getContractsForOwner?owner=${for_address}&pageKey=${pageKey}`;
   } else {
-    url = ` https://avax-mainnet.g.alchemy.com/nft/v3/${process.env.ALCHEMY_API_KEY}/getCollectionsForOwner?owner=${for_address}`;
+    url = ` https://avax-mainnet.g.alchemy.com/nft/v3/${process.env.ALCHEMY_API_KEY}/getContractsForOwner?owner=${for_address}`;
   }
 
   switch (req.method) {
     case "GET":
       try {
-        // const response = await fetch(url);
-        // const fetchedCollections = await response.json();
+        const response = await fetch(url);
+        const fetchedCollections = await response.json();
 
-        const fetchedCollections = FakeCollectionsData;
+        // const fetchedCollections = FakeCollectionsData;
 
         res.status(200).json(fetchedCollections);
       } catch (error) {

@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { type MouseEvent, useState } from "react";
 
-export function useMultiSelect(fullArray) {
-  const [selectedArray, setSelectedArray] = useState([]);
-  const [lastChecked, setLastChecked] = useState(null);
+export function useMultiSelect<T>(fullArray: T[]) {
+  const [selectedArray, setSelectedArray] = useState<T[]>([]);
+  const [lastChecked, setLastChecked] = useState<T | null>(null);
 
-  const wasChecked = (id) => selectedArray.includes(id);
+  const wasChecked = (id: T) => selectedArray.includes(id);
 
-  const toggleSelection = (clickedId) => {
+  const toggleSelection = (clickedId: T) => {
     if (!wasChecked(clickedId)) {
       setSelectedArray((prev) => [...prev, clickedId]);
     } else {
@@ -14,18 +14,17 @@ export function useMultiSelect(fullArray) {
     }
   };
 
-  const handleCheck = (e, clickedId) => {
-    if (e.shiftKey) {
+  const handleCheck = (e: MouseEvent<HTMLInputElement>, clickedId: T) => {
+    if (e.shiftKey && lastChecked) {
       const prevIndex = fullArray.indexOf(lastChecked);
       const clickedIndex = fullArray.indexOf(clickedId);
-      let idsInBetween = null;
+      let idsInBetween: T[] = [];
 
       if (prevIndex < clickedIndex) {
         idsInBetween = fullArray.slice(prevIndex, clickedIndex + 1);
       } else {
         idsInBetween = fullArray.slice(clickedIndex, prevIndex + 1);
       }
-
 
       if (wasChecked(clickedId)) {
         // deselect all in between

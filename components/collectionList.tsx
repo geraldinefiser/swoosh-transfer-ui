@@ -1,10 +1,27 @@
 import { Avatar, Badge, Code, RadioCards, ScrollArea } from "@radix-ui/themes";
 
+interface Contract {
+  address: string;
+  image: {
+    thumbnailUrl: string;
+  };
+  name: string;
+  numDistinctTokensOwned: string;
+}
+interface CollectionsData {
+  contracts: Contract[];
+}
+interface CollectionListProps {
+  selectedCollectionAddress: string;
+  setSelectCollectionAddress: (value: string) => void;
+  data: CollectionsData[];
+}
+
 export default function CollectionList({
   selectedCollectionAddress,
   setSelectCollectionAddress,
   data,
-}) {
+}: CollectionListProps) {
   return (
     <ScrollArea
       type="always"
@@ -17,11 +34,11 @@ export default function CollectionList({
         onValueChange={(value) => setSelectCollectionAddress(value)}
       >
         {data
-          ?.flatMap((serie) => serie.collections)
+          ?.flatMap((serie) => serie.contracts)
           .map((collection, index) => (
             <RadioCards.Item
-              value={collection.contract.address}
-              key={collection.contract.address}
+              value={collection.address}
+              key={collection.address}
             >
               <div className="w-full flex flex-row justify-start items-center gap-1 overflow-hidden ">
                 <Avatar
@@ -38,8 +55,8 @@ export default function CollectionList({
                     </Badge>
                   </div>
                   <Code>
-                    {collection.contract.address.slice(0, 5)}...
-                    {collection.contract.address.slice(-4)}
+                    {collection.address.slice(0, 5)}...
+                    {collection.address.slice(-4)}
                   </Code>
                 </div>
               </div>

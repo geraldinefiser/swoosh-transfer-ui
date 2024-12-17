@@ -86,7 +86,7 @@ describe("Dashboard", () => {
     vi.mocked(useSWRInfinite).mockReturnValue({
       data: [
         {
-          collections: [],
+          contracts: [],
           totalCount: 0,
           pageKey: null,
         },

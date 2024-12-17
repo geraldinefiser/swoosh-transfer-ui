@@ -1,11 +1,29 @@
 import { Avatar } from "@radix-ui/themes";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { CheckIcon } from "@heroicons/react/24/solid";
 import { useMultiSelect } from "@/hooks/useMultiSelect";
-import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import TransferDialog from "./transferDialog";
 
-export default function NftTable({ nfts, contract, mutateNfts }) {
+interface Nft {
+  tokenId: string;
+  name: string;
+  image: {
+    thumbnailUrl?: string;
+    cachedUrl?: string;
+  };
+}
+interface Contract {
+  address: string;
+  name: string;
+}
+
+interface TableProps {
+  nfts: Nft[];
+  contract: Contract;
+  mutateNfts: () => void;
+}
+
+export default function NftTable({ nfts, contract, mutateNfts }: TableProps) {
   const { selectedArray: selectedNfts, handleCheck } = useMultiSelect(
     nfts.map((nft) => nft.tokenId)
   );
@@ -22,9 +40,9 @@ export default function NftTable({ nfts, contract, mutateNfts }) {
         />
       </div>
       <hr className="my-3" />
-      {nfts.map((nft, index) => (
+      {nfts.map((nft) => (
         <Fragment key={nft.tokenId}>
-          <label key={nft.tokenId} className="flex flex-row gap-2 items-center">
+          <label className="flex flex-row gap-2 items-center">
             <input
               type="checkbox"
               className="peer appearance-none"
