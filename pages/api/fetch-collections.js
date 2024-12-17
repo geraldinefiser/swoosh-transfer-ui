@@ -15,10 +15,10 @@ export default async function handler(req, res) {
   switch (req.method) {
     case "GET":
       try {
-        const response = await fetch(url);
-        const fetchedCollections = await response.json();
+        // const response = await fetch(url);
+        // const fetchedCollections = await response.json();
 
-        // const fetchedCollections = FakeCollectionsData;
+        const fetchedCollections = FakeCollectionsData;
 
         res.status(200).json(fetchedCollections);
       } catch (error) {

@@ -12,10 +12,10 @@ export default async function handler(req, res) {
   switch (req.method) {
     case "GET":
       try {
-        const response = await fetch(url);
-        const fetchedNfts = await response.json();
+        // const response = await fetch(url);
+        // const fetchedNfts = await response.json();
 
-        // const fetchedNfts = FakeJsonData;
+        const fetchedNfts = FakeJsonData;
 
         res.status(200).json(fetchedNfts);
       } catch (error) {
