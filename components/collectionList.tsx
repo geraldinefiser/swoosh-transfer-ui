@@ -1,16 +1,5 @@
 import { Avatar, Badge, Code, RadioCards, ScrollArea } from "@radix-ui/themes";
 
-interface Contract {
-  address: string;
-  image: {
-    thumbnailUrl: string;
-  };
-  name: string;
-  numDistinctTokensOwned: string;
-}
-interface CollectionsData {
-  contracts: Contract[];
-}
 interface CollectionListProps {
   selectedCollectionAddress: string;
   setSelectCollectionAddress: (value: string) => void;
@@ -34,7 +23,7 @@ export default function CollectionList({
         onValueChange={(value) => setSelectCollectionAddress(value)}
       >
         {data
-          ?.flatMap((serie) => serie.contracts)
+          .flatMap((serie) => serie.contracts)
           .map((collection, index) => (
             <RadioCards.Item
               value={collection.address}

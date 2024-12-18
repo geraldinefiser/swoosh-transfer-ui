@@ -4,26 +4,13 @@ import { CheckIcon } from "@heroicons/react/24/solid";
 import { useMultiSelect } from "@/hooks/useMultiSelect";
 import TransferDialog from "./transferDialog";
 
-interface Nft {
-  tokenId: string;
-  name: string;
-  image: {
-    thumbnailUrl?: string;
-    cachedUrl?: string;
-  };
-}
-interface Contract {
-  address: string;
-  name: string;
-}
-
 interface TableProps {
   nfts: Nft[];
-  contract: Contract;
   mutateNfts: () => void;
 }
 
-export default function NftTable({ nfts, contract, mutateNfts }: TableProps) {
+export default function NftTable({ nfts, mutateNfts }: TableProps) {
+  const contract = nfts[0].contract;
   const { selectedArray: selectedNfts, handleCheck } = useMultiSelect(
     nfts.map((nft) => nft.tokenId)
   );
