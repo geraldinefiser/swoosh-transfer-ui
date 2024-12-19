@@ -10,6 +10,7 @@ import useSWR from "swr";
 import useSWRInfinite, { type SWRInfiniteKeyLoader } from "swr/infinite";
 import { useAccount } from "wagmi";
 import NftLoading from "@/components/nftLoading";
+import type { Nft, CollectionsData } from "@/types/common";
 
 type CollectionsResponse = CollectionsData | { error: { message: string } };
 
@@ -47,7 +48,6 @@ export default function Dashboard() {
     data: nftData,
     mutate: mutateNfts,
     isLoading: isNftLoading,
-    error: nftError,
   } = useSWR<NftData>(
     address && selectedCollectionAddress
       ? `/api/fetch-nfts?for_address=${address}&for_collection=${selectedCollectionAddress}`

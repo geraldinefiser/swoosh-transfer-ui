@@ -9,7 +9,7 @@ export default function About() {
       <div className="bg-blue-100/50 rounded w-full p-10 text-blue-500 ">
         <p className="font-bold">
           Batch NFT transfer contract by{" "}
-          <a href="https://x.com/xrpant" target="_blank">
+          <a href="https://x.com/xrpant" target="_blank" rel="noreferrer">
             xrpant &nbsp;
             <ArrowTopRightOnSquareIcon className="inline w-3 h-3" />
           </a>
@@ -19,6 +19,7 @@ export default function About() {
           <a
             target="_blank"
             href="https://snowtrace.io/address/0xe141058cceb71a1c486987d2bfb18b5e1fd4d93f"
+            rel="noreferrer"
           >
             <Code>0xe141058cceb71a1c486987d2bfb18b5e1fd4d93f</Code>&nbsp;
             <ArrowTopRightOnSquareIcon className="inline w-3 h-3" />

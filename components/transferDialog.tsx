@@ -4,8 +4,8 @@ import {
 } from "@heroicons/react/24/outline";
 import bulkSend from "@/utils/BulkSend.json";
 
-import { useRef, useState } from "react";
-import { erc721Abi, isAddress } from "viem";
+import { type FormEvent, useRef, useState } from "react";
+import { type Address, erc721Abi, isAddress } from "viem";
 import { useAccount } from "wagmi";
 import { Badge, Callout } from "@radix-ui/themes";
 import { useApprovalStatus } from "@/hooks/useApprovalStatus";
@@ -13,13 +13,19 @@ import { useTransferStatus } from "@/hooks/useTransferStatus";
 
 const BulkSendCA = "0xe141058cceb71a1c486987d2bfb18b5e1fd4d93f";
 
+interface TransferDialogProps {
+  contractAddress: Address;
+  selectedNfts: string[];
+  mutateNfts: () => void;
+}
+
 export default function TransferDialog({
   contractAddress,
   selectedNfts,
   mutateNfts,
-}) {
+}: TransferDialogProps) {
   const [error, setError] = useState("");
-  const receiver = useRef(null);
+  const receiver = useRef<HTMLInputElement | null>(null);
   const { address: userAddress } = useAccount();
 
   const { approvalStatus, writeApprovalContract } = useApprovalStatus(
@@ -29,8 +35,11 @@ export default function TransferDialog({
 
   const { writeStatus, writeContract } = useTransferStatus(mutateNfts);
 
-  const handleTransfer = (e) => {
+  const handleTransfer = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (receiver.current === null) return;
+
     const receiverAddress = receiver.current.value;
 
     if (approvalStatus !== "approved") {

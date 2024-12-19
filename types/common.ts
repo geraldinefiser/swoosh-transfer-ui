@@ -1,4 +1,6 @@
-interface Nft {
+import type { Address } from "viem";
+
+export type Nft = {
   tokenId: string;
   contract: BaseContract;
   name: string;
@@ -6,22 +8,21 @@ interface Nft {
     thumbnailUrl?: string;
     cachedUrl?: string;
   };
-}
+};
 
-interface BaseContract {
-  address: string;
+export type BaseContract = {
+  address: Address;
   name: string;
-}
+};
 
-type Contract = {
+export type Contract = {
   image: {
     thumbnailUrl: string;
   };
-  name: string;
   numDistinctTokensOwned: string;
 } & BaseContract;
 
-type CollectionsData = {
+export type CollectionsData = {
   contracts: Contract[];
   totalCount: number;
   pageKey: string;

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
-export function useTransferStatus(mutateNfts) {
+export function useTransferStatus(mutateNfts: () => void) {
   const { data: hash, writeContract, isPending, reset } = useWriteContract();
 
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
@@ -9,7 +9,7 @@ export function useTransferStatus(mutateNfts) {
   });
 
   useEffect(() => {
-    let timeoutId;
+    let timeoutId: NodeJS.Timeout;
     if (isSuccess) {
       mutateNfts();
 
@@ -28,8 +28,13 @@ export function useTransferStatus(mutateNfts) {
     };
   }, [isSuccess, mutateNfts, reset]);
 
-  const writeStatus =
-    isPending || isConfirming ? "loading" : isSuccess ? "confirmed" : "idle";
+  const getStatus = (): "loading" | "confirmed" | "idle" => {
+    if (isPending || isConfirming) return "loading";
+    if (isSuccess) return "confirmed";
+    return "idle";
+  };
 
-  return { writeStatus: writeStatus, writeContract };
+  const writeStatus = getStatus();
+
+  return { writeStatus, writeContract };
 }

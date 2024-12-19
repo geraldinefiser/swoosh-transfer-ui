@@ -1,3 +1,4 @@
+import type { CollectionsData } from "@/types/common";
 import { Avatar, Badge, Code, RadioCards, ScrollArea } from "@radix-ui/themes";
 
 interface CollectionListProps {

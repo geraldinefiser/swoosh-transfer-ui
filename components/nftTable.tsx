@@ -3,6 +3,7 @@ import { Fragment } from "react";
 import { CheckIcon } from "@heroicons/react/24/solid";
 import { useMultiSelect } from "@/hooks/useMultiSelect";
 import TransferDialog from "./transferDialog";
+import type { Nft } from "@/types/common";
 
 interface TableProps {
   nfts: Nft[];
